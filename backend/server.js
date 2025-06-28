@@ -74,6 +74,27 @@ app.get('/:shortcode', (req, res) => {
     }
 });
 
+//retrieves Short URL statistics
+app.get('/shorturls/:shortcode', (req, res) => {
+    try {
+        const { shortcode } = req.params;
+        const record = getUrl(shortcode);
+        if (!record) {
+            Log("backend", "error", "handler", "Shortcode not found");
+            return res.status(404).json({ error: "Shortcode not found" });
+        }
+        Log("backend", "info", "handler", `Stats retrieved: ${shortcode}`);
+        res.json({
+            url: record.url,
+            createdAt: record.createdAt,
+            expiry: record.expiry,
+            hits: record.hits
+        });
+    } catch (err) {
+        Log("backend", "error", "handler", err.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 // Middleware for error handle
 app.use((err, req, res, next) => {
